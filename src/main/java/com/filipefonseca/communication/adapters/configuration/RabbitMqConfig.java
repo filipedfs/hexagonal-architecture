@@ -16,10 +16,13 @@ public class RabbitMqConfig {
 
   @Value("${spring.rabbitmq.host}")
   private String host;
+
   @Value("${spring.rabbitmq.port}")
   private int port;
+
   @Value("${spring.rabbitmq.password}")
   private String password;
+
   @Value("${spring.rabbitmq.username}")
   private String username;
 

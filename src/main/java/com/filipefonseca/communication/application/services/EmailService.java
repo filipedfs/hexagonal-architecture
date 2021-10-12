@@ -1,27 +1,24 @@
 package com.filipefonseca.communication.application.services;
 
-import com.filipefonseca.communication.application.entities.Email;
-import com.filipefonseca.communication.application.entities.enums.EmailStatus;
-import com.filipefonseca.communication.application.ports.EmailRepositoryInterface;
-import com.filipefonseca.communication.application.ports.EmailServiceInterface;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import com.filipefonseca.communication.application.domain.Email;
+import com.filipefonseca.communication.application.domain.PageInfo;
+import com.filipefonseca.communication.application.domain.enums.EmailStatus;
+import com.filipefonseca.communication.application.ports.EmailRepositoryPort;
+import com.filipefonseca.communication.application.ports.EmailServicePort;
+import com.filipefonseca.communication.application.ports.SendEmailServicePort;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class EmailService implements EmailServiceInterface {
-  private final EmailRepositoryInterface emailRepository;
+public class EmailService implements EmailServicePort {
+  private final EmailRepositoryPort emailRepositoryPort;
+  private final SendEmailServicePort sendEmailServicePort;
 
-  private final JavaMailSender emailSender;
-
-  public EmailService(final EmailRepositoryInterface emailRepository, final JavaMailSender emailSender) {
-    this.emailRepository = emailRepository;
-    this.emailSender = emailSender;
+  public EmailService(final EmailRepositoryPort emailRepositoryPort, final SendEmailServicePort sendEmailServicePort) {
+    this.emailRepositoryPort = emailRepositoryPort;
+    this.sendEmailServicePort = sendEmailServicePort;
   }
 
   @Override
@@ -29,28 +26,22 @@ public class EmailService implements EmailServiceInterface {
     email.setSentAt(LocalDateTime.now());
 
     try {
-      SimpleMailMessage message = new SimpleMailMessage();
-      message.setFrom(email.getEmailFrom());
-      message.setTo(email.getEmailTo());
-      message.setSubject(email.getSubject());
-      message.setText(email.getText());
-      emailSender.send(message);
+      sendEmailServicePort.sendEmailSmtp(email);
       email.setStatus(EmailStatus.SENT);
-    } catch (MailException e) {
+    } catch (Exception e) {
       email.setStatus(EmailStatus.FAILED);
     }
 
-    return emailRepository.save(email);
-
+    return emailRepositoryPort.save(email);
   }
 
   @Override
-  public Page<Email> findAll(Pageable pageable) {
-    return this.emailRepository.findAll(pageable);
+  public List<Email> findAll(PageInfo pageInfo) {
+    return emailRepositoryPort.findAll(pageInfo);
   }
 
   @Override
   public Optional<Email> findById(UUID emailId) {
-    return this.emailRepository.findById(emailId);
+    return emailRepositoryPort.findById(emailId);
   }
 }
