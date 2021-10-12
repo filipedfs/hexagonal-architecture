@@ -1,6 +1,6 @@
-package com.filipefonseca.communication.models;
+package com.filipefonseca.communication.application.entities;
 
-import com.filipefonseca.communication.enums.EmailStatus;
+import com.filipefonseca.communication.application.entities.enums.EmailStatus;
 import lombok.Data;
 
 import javax.persistence.*;

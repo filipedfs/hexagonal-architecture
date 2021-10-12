@@ -1,4 +1,4 @@
-package com.filipefonseca.communication.dtos;
+package com.filipefonseca.communication.adapters.inbound.dtos;
 
 import lombok.Data;
 
